@@ -12,10 +12,26 @@ st.set_page_config(page_title="Visualizar Notas de Física General 2025-2", page
 EXCEL_URL = "https://docs.google.com/spreadsheets/d/17bSX9rOMlrOMLlXVrUshexavZxt9BcdN/edit?usp=drive_link&ouid=104569301030055065312&rtpof=true&sd=true"
 
 # Función para cargar datos
-@st.cache_resource(ttl=600)
+#@st.cache_resource(ttl=600)
+#def load_data():
+#    response = requests.get(EXCEL_URL)
+#    return pd.ExcelFile(BytesIO(response.content))
+
+# Reemplaza la función load_data con:
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
 def load_data():
-    response = requests.get(EXCEL_URL)
-    return pd.ExcelFile(BytesIO(response.content))
+    scope = ['https://spreadsheets.google.com/feeds',
+             'https://www.googleapis.com/auth/drive']
+    
+    # Crea un archivo credentials.json con las credenciales de Google API
+    creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+    client = gspread.authorize(creds)
+    
+    # Abre por URL
+    spreadsheet = client.open_by_url("https://docs.google.com/spreadsheets/d/187LELG4kMazPk7cE5VR8IVmWsAC525Pr9ai4Ouixx6Y/edit?usp=sharing")
+    return spreadsheet
 
 # Función de autenticación
 def authenticate(excel_file, grupo, codigo, password):
